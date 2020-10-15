@@ -16,11 +16,6 @@ CREATE TABLE users.profile (
     picture TEXT 
 );
 
-CREATE FUNCTION users.get_current_user_id() RETURNS UUID LANGUAGE SQL STABLE AS 
-$$
-  SELECT NULLIF(current_setting('user.id', TRUE), ''::TEXT)::UUID;
-$$;
-
 CREATE TABLE users.profile_google (
     user_id UUID NOT NULL REFERENCES users.profile ON UPDATE CASCADE ON DELETE CASCADE UNIQUE,
     google_id TEXT NOT NULL UNIQUE,

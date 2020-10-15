@@ -1,19 +1,21 @@
-import express from "express";
+import express, { Request } from "express";
+import { graphqlHTTP } from "express-graphql";
 import cookieParser from "cookie-parser";
-import { session as sessionConfig } from "./config";
 import routes from "./routes";
 import passport from "passport";
 import { pgPool } from "./db";
 import * as auth from "./auth";
-
+import schema from "./graphql";
+import { Context } from "./context";
+import { app as appConfig, session as sessionConfig } from "./config";
 import session from "express-session";
 import connectSession from "connect-pg-simple";
-
-const pgSession = connectSession(session);
 
 const app = express();
 
 app.use(cookieParser(sessionConfig.secret));
+
+const pgSession = connectSession(session);
 
 app.use(
   session({
@@ -27,6 +29,15 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(
+  "/graphql",
+  graphqlHTTP(async (req) => ({
+    schema,
+    context: new Context(req as Request),
+    graphiql: !appConfig.production,
+    pretty: !appConfig.production,
+  }))
+);
 
 app.use("/", routes);
 
