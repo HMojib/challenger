@@ -18,12 +18,9 @@ export const isAuthenticated = (
 };
 
 passport.serializeUser<any, any>((user, done) => {
-  console.log("SERIALIZE: ", user);
   done(undefined, user);
 });
 
 passport.deserializeUser((user, done) => {
-  console.log("DESERIALIZE: ", user);
-
   done(undefined, user);
 });

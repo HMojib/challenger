@@ -16,6 +16,7 @@
     "@types/cookie-parser": "^1.4.2",
     "@types/express": "^4.17.7",
     "@types/express-session": "^1.17.0",
+    "@types/graphql-iso-date": "^3.4.0",
     "@types/graphql-relay": "^0.6.0",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/node": "^14.0.27",
@@ -29,6 +30,7 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.161",
     "apollo-server-express": "^2.16.1",
     "connect-pg-simple": "^6.2.0",
     "cookie-parser": "^1.4.5",
@@ -36,11 +38,17 @@
     "express": "^4.17.1",
     "express-graphql": "^0.11.0",
     "express-session": "^1.17.1",
+    "graphile-utils": "^4.8.0",
     "graphql": "^15.3.0",
+    "graphql-iso-date": "^3.6.1",
+    "graphql-parse-resolve-info": "^4.8.0-rc.0",
     "graphql-relay": "^0.6.0",
     "jsonwebtoken": "^8.5.1",
+    "knex": "^0.21.5",
+    "lodash": "^4.17.20",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
-    "pg": "^8.3.0"
+    "pg": "^8.3.0",
+    "pg-camelcase": "0.0.3"
   }
 }

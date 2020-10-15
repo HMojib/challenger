@@ -2,9 +2,9 @@ import passport from "passport";
 import { Request } from "express";
 import { Strategy as GoogleStrategy, Profile } from "passport-google-oauth20";
 import { pgPool, User } from "../../db";
-import { auth } from "../../config";
+import { auth as authConfig } from "../../config";
 
-const { google } = auth;
+const { google: googleConfig } = authConfig;
 
 interface Name {
   familyName: string;
@@ -124,4 +124,4 @@ const handleGoogleProfile = (
   }
 };
 
-passport.use(new GoogleStrategy(google, handleGoogleProfile));
+passport.use(new GoogleStrategy(googleConfig, handleGoogleProfile));
