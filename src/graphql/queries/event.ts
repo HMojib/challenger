@@ -4,7 +4,7 @@ import { GraphQLFieldConfig, GraphQLID, GraphQLNonNull } from "graphql";
 import { fromGlobalId, connectionFromNodes } from "../../utils";
 import { pgPool, getEvents } from "../../db";
 import { EventType, EventConnection, NodeByIDArguments } from "../types";
-import { Context } from "../../context";
+import { Context } from "../context";
 import { eventById } from "../resolvers";
 import {
   parseResolveInfo,

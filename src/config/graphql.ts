@@ -1,6 +1,6 @@
 interface NodeLimits {
-  maxNodeLimit: Number;
-  defaultNodeLimit: Number;
+  maxNodeLimit: number;
+  defaultNodeLimit: number;
 }
 
 export const nodeLimits: NodeLimits = {

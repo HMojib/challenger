@@ -6,10 +6,11 @@ import passport from "passport";
 import { pgPool } from "./db";
 import * as auth from "./auth";
 import schema from "./graphql";
-import { Context } from "./context";
+import { Context } from "./graphql/context";
 import { app as appConfig, session as sessionConfig } from "./config";
 import session from "express-session";
 import connectSession from "connect-pg-simple";
+import { createDataLoaders } from "./middleware";
 
 const app = express();
 
@@ -29,6 +30,9 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(createDataLoaders);
+
 app.use(
   "/graphql",
   graphqlHTTP(async (req) => ({

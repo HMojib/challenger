@@ -4,11 +4,14 @@ import {
   GraphQLNonNull,
   GraphQLString,
   GraphQLInputObjectType,
+  GraphQLInt,
 } from "graphql";
 
 import { GraphQLDateTime } from "graphql-iso-date";
 
 import { IntervalInputType, IntervalType, Interval } from "./common";
+
+import { eventTypeById } from "../resolvers";
 
 export const EventInputType = new GraphQLInputObjectType({
   name: "EventInput",
@@ -18,6 +21,7 @@ export const EventInputType = new GraphQLInputObjectType({
     description: { type: new GraphQLNonNull(GraphQLString) },
     startTime: { type: new GraphQLNonNull(GraphQLDateTime) },
     frequency: { type: new GraphQLNonNull(IntervalInputType) },
+    eventType: { type: new GraphQLNonNull(GraphQLInt) },
   },
 });
 
@@ -42,6 +46,10 @@ export const EventType = new GraphQLObjectType({
     startTime: { type: new GraphQLNonNull(GraphQLDateTime) },
     createdAt: { type: new GraphQLNonNull(GraphQLDateTime) },
     createdBy: globalIdField("User", (event) => event.createdBy),
+    eventType: {
+      type: new GraphQLNonNull(GraphQLString),
+      resolve: eventTypeById,
+    },
   },
 });
 
@@ -55,6 +63,7 @@ export interface EventInput {
   description: string;
   frequency: Interval;
   startTime: string;
+  eventType: number;
 }
 
 export interface EventPatch {

@@ -1,7 +1,7 @@
 import { GraphQLNonNull, GraphQLID, GraphQLResolveInfo } from "graphql";
 import { mutationWithClientMutationId } from "graphql-relay";
 import { fromGlobalId, parseInterval } from "../../utils";
-import { Context } from "../../context";
+import { Context } from "../context";
 import {
   EventType,
   EventInputType,
@@ -33,11 +33,9 @@ export interface UpdatEventInput {
 }
 
 const validateEventMutation = (event: Event, userId: string): boolean => {
-  const { id, createdBy } = event;
-
-  if (!id) {
+  if (!event) {
     throw new Error("Event not found");
-  } else if (createdBy !== userId) {
+  } else if (event.createdBy !== userId) {
     throw new Error("You don't have permission to modify this Event");
   } else {
     return true;
