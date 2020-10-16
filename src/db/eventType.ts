@@ -10,6 +10,11 @@ export interface EventType {
   title: string;
 }
 
+export interface EventTypeNode extends Node {
+  tag: string;
+  title: string;
+}
+
 export const batchEventTypeById = async (
   pgClient: PoolClient,
   ids: readonly number[],
@@ -25,3 +30,15 @@ export const batchEventTypeById = async (
 
   return rows;
 };
+
+export const getEventTypes = async (
+  pgClient: PoolClient,
+  args: ConnectionArguments,
+  fields: string[]
+): Promise<EventTypeNode[]> =>
+  queryFromTableWithConnectionArgs(
+    pgClient,
+    args,
+    "challenger.event_type",
+    fields
+  );
