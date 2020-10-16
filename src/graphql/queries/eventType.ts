@@ -2,58 +2,68 @@ import { ConnectionArguments, connectionArgs } from "graphql-relay";
 import { GraphQLFieldConfig, GraphQLID, GraphQLNonNull } from "graphql";
 
 import { fromGlobalId, connectionFromNodes } from "../../utils";
-import { pgPool, getEvents } from "../../db";
-import { EventType, EventConnection, NodeByIDArguments } from "../types";
+import { pgPool, getEventTypes } from "../../db";
+import {
+  EventTypeType,
+  EventTypeConnection,
+  NodeByIDArguments,
+} from "../types";
 import { Context } from "../context";
-import { eventById } from "../resolvers";
 import {
   parseResolveInfo,
   simplifyParsedResolveInfoFragmentWithType,
   ResolveTree,
 } from "graphql-parse-resolve-info";
 
-export const events: GraphQLFieldConfig<{}, Context, ConnectionArguments> = {
-  type: EventConnection,
+export const eventTypes: GraphQLFieldConfig<
+  {},
+  Context,
+  ConnectionArguments
+> = {
+  type: EventTypeConnection,
   args: connectionArgs,
-  description: "The list of events.",
+  description: "The list of event types.",
 
   async resolve(self, args, ctx, info) {
     const parsedResolveInfoFragment = parseResolveInfo(info) as ResolveTree;
-    const EventConnectionInfo = simplifyParsedResolveInfoFragmentWithType(
+    const ConnectionInfo = simplifyParsedResolveInfoFragmentWithType(
       parsedResolveInfoFragment,
-      EventConnection
+      EventTypeConnection
     );
 
     const additionalFields =
       // @ts-ignore: Unreachable code error
-      EventConnectionInfo.fields?.edges?.fieldsByTypeName?.EventEdge?.node
-        ?.fieldsByTypeName?.Event || {};
+      ConnectionInfo.fields?.edges?.fieldsByTypeName?.EventTypeEdge?.node
+        ?.fieldsByTypeName?.EventType || {};
 
     const pgClient = await pgPool.connect();
 
     try {
-      const nodes = await getEvents(
+      const nodes = await getEventTypes(
         pgClient,
         args,
         Object.keys(additionalFields).filter((key) => key !== "id")
       );
 
-      return connectionFromNodes(nodes, "Event");
+      return connectionFromNodes(nodes, "EventType");
     } finally {
       pgClient.release();
     }
   },
 };
 
-export const event: GraphQLFieldConfig<{}, Context, ConnectionArguments> = {
-  type: EventType,
+export const eventType: GraphQLFieldConfig<{}, Context, ConnectionArguments> = {
+  type: EventTypeType,
   args: {
     id: { type: new GraphQLNonNull(GraphQLID) },
   },
-  description: "Event by ID",
+  description: "Event type by ID",
   resolve: (self, args, ctx, info) => {
     const { id: globalId } = args as NodeByIDArguments;
-    const eventId = fromGlobalId(globalId, "Event");
-    return eventById(eventId, info);
+    const eventTypeId = fromGlobalId(globalId, "EventType");
+    const { loaders } = ctx;
+    const { eventTypeLoader } = loaders;
+
+    return eventTypeLoader.load(Number(eventTypeId));
   },
 };

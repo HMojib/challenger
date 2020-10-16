@@ -1,5 +1,4 @@
 import { Request } from "express";
-import { User } from "./db";
 
 /**
  * GraphQL API context variables.
@@ -16,5 +15,9 @@ export class Context {
    */
   get user() {
     return this.req.user;
+  }
+
+  get loaders() {
+    return this.req.loaders;
   }
 }

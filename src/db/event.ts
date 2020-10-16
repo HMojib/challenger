@@ -5,12 +5,12 @@ import { Node } from "../graphql/types";
 import { snakeCase } from "lodash";
 
 export interface PostgresInterval {
-  seconds?: Number;
-  minutes?: Number;
-  hours?: Number;
-  days?: Number;
-  months?: Number;
-  years?: Number;
+  seconds?: number;
+  minutes?: number;
+  hours?: number;
+  days?: number;
+  months?: number;
+  years?: number;
 }
 
 export interface Event {
@@ -21,6 +21,7 @@ export interface Event {
   startTime: string;
   createdAt: string;
   createdBy: string;
+  eventType: number;
 }
 
 export interface NewEvent {
@@ -30,6 +31,7 @@ export interface NewEvent {
   startTime: string;
   createdAt: string;
   createdBy: string;
+  eventType: number;
 }
 
 export interface UpdateEvent {
@@ -47,6 +49,7 @@ export interface EventNode extends Node {
   startTime: string;
   createdAt: string;
   createdBy: string;
+  eventType: number;
 }
 
 export const insertEvent = async (
@@ -60,11 +63,12 @@ export const insertEvent = async (
     startTime,
     createdAt,
     createdBy,
+    eventType,
   } = event;
 
   const text = `
-    INSERT INTO challenger.event (title, description, frequency, start_time, created_at, created_by) 
-    VALUES ($1, $2, $3, $4, $5, $6) 
+    INSERT INTO challenger.event (title, description, frequency, start_time, created_at, created_by, event_type) 
+    VALUES ($1, $2, $3, $4, $5, $6, $7) 
     RETURNING id
     `;
 
@@ -75,6 +79,7 @@ export const insertEvent = async (
     startTime,
     createdAt,
     createdBy,
+    eventType,
   ];
 
   const {
@@ -103,10 +108,10 @@ export const updateEventById = async (
   const updateParams = fields.map((field) => event[field]);
 
   const text = `
-  UPDATE challenger.event 
-  SET ${updates.join(",")} 
-  WHERE id = $1 
-  RETURNING id`;
+    UPDATE challenger.event 
+    SET ${updates.join(",")} 
+    WHERE id = $1 
+    RETURNING id`;
 
   const params = [id, ...updateParams];
 

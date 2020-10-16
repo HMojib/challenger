@@ -5,3 +5,4 @@ export interface User {
 export * from "./event";
 export * from "./utils";
 export * from "./connection";
+export * from "./eventType";
