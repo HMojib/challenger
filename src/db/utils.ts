@@ -1,6 +1,6 @@
 import { ConnectionArguments } from "graphql-relay";
 import { db as dbConfig } from "../config";
-import { fromGlobalId } from "../utils";
+import { fromGlobalId } from "../graphql/utils";
 import { PoolClient } from "pg";
 import { snakeCase } from "lodash";
 
@@ -73,4 +73,39 @@ export const queryFromTableWithConnectionArgs = async (
 
   const { rows } = await pgClient.query(sql, params);
   return rows;
+};
+
+export const batchQueryTable = async (
+  pgClient: PoolClient,
+  ids: readonly any[],
+  additionalFields: string[],
+  table: string
+): Promise<any> => {
+  const text = `
+    SELECT ${["id", ...additionalFields].map(snakeCase).join(",")} 
+    FROM ${table} 
+    WHERE id = any ($1)`;
+  const params = [ids];
+  const { rows } = await pgClient.query(text, params);
+  return rows;
+};
+
+export const getRecordById = async (
+  pgClient: PoolClient,
+  id: any,
+  additionalFields: string[],
+  table: string
+): Promise<any> => {
+  const text = `
+    SELECT ${["id", ...additionalFields].map(snakeCase).join(",")} 
+    FROM ${table} 
+    WHERE id = $1`;
+
+  const params = [id];
+
+  const {
+    rows: [row],
+  } = await pgClient.query(text, params);
+
+  return row;
 };

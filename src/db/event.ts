@@ -1,6 +1,6 @@
 import { PoolClient } from "pg";
 import { ConnectionArguments } from "graphql-relay";
-import { queryFromTableWithConnectionArgs } from "./utils";
+import { queryFromTableWithConnectionArgs, getRecordById } from "./utils";
 import { Node } from "../graphql/types";
 import { snakeCase } from "lodash";
 
@@ -132,17 +132,7 @@ export const getEventById = async (
   id: string,
   fields: string[]
 ): Promise<Event> => {
-  const text = `
-  SELECT id, ${fields.map(snakeCase).join(",")} 
-  FROM challenger.event 
-  WHERE id = $1`;
-  const params = [id];
-
-  const {
-    rows: [row],
-  } = await pgClient.query(text, params);
-
-  return row;
+  return getRecordById(pgClient, id, fields, "challenger.event");
 };
 
 export const getEvents = async (

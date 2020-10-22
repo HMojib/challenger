@@ -4,7 +4,13 @@ import {
   Connection,
 } from "graphql-relay";
 
-import { Node, Interval } from "../graphql/types";
+import { Node, Interval } from "../types";
+import {
+  parseResolveInfo,
+  simplifyParsedResolveInfoFragmentWithType,
+  ResolveTree,
+} from "graphql-parse-resolve-info";
+import { GraphQLObjectType, GraphQLResolveInfo } from "graphql";
 
 export const fromGlobalId = (
   globalId: string,
@@ -53,4 +59,36 @@ export const parseInterval = (interval: Interval): string => {
     }
   }
   return parts.join(" ");
+};
+
+export const resolveNodeFieldsFromConnection = (
+  info: GraphQLResolveInfo,
+  connection: GraphQLObjectType,
+  nodeType: string
+): string[] => {
+  const parsedResolveInfoFragment = parseResolveInfo(info) as ResolveTree;
+  const ConnectionInfo = simplifyParsedResolveInfoFragmentWithType(
+    parsedResolveInfoFragment,
+    connection
+  );
+  const edgeType = `${nodeType}Edge`;
+  const fields =
+    // @ts-ignore: Unreachable code error
+    ConnectionInfo.fields?.edges?.fieldsByTypeName?.[edgeType]?.node
+      ?.fieldsByTypeName?.[nodeType] || {};
+
+  return Object.keys(fields).filter((key) => key !== "id");
+};
+
+export const resolveNodeFieldsFromNode = (
+  info: GraphQLResolveInfo,
+  node: GraphQLObjectType
+): string[] => {
+  const parsedResolveInfoFragment = parseResolveInfo(info) as ResolveTree;
+  const { fields } = simplifyParsedResolveInfoFragmentWithType(
+    parsedResolveInfoFragment,
+    node
+  );
+
+  return Object.keys(fields).filter((key) => key !== "id");
 };

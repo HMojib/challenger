@@ -1,16 +1,15 @@
 import { ConnectionArguments, connectionArgs } from "graphql-relay";
 import { GraphQLFieldConfig, GraphQLID, GraphQLNonNull } from "graphql";
 
-import { fromGlobalId, connectionFromNodes } from "../../utils";
+import {
+  fromGlobalId,
+  connectionFromNodes,
+  resolveNodeFieldsFromConnection,
+} from "../utils";
 import { pgPool, getEvents } from "../../db";
 import { EventType, EventConnection, NodeByIDArguments } from "../types";
 import { Context } from "../context";
 import { eventById } from "../resolvers";
-import {
-  parseResolveInfo,
-  simplifyParsedResolveInfoFragmentWithType,
-  ResolveTree,
-} from "graphql-parse-resolve-info";
 
 export const events: GraphQLFieldConfig<{}, Context, ConnectionArguments> = {
   type: EventConnection,
@@ -18,25 +17,16 @@ export const events: GraphQLFieldConfig<{}, Context, ConnectionArguments> = {
   description: "The list of events.",
 
   async resolve(self, args, ctx, info) {
-    const parsedResolveInfoFragment = parseResolveInfo(info) as ResolveTree;
-    const EventConnectionInfo = simplifyParsedResolveInfoFragmentWithType(
-      parsedResolveInfoFragment,
-      EventConnection
+    const fields = resolveNodeFieldsFromConnection(
+      info,
+      EventConnection,
+      "Event"
     );
-
-    const additionalFields =
-      // @ts-ignore: Unreachable code error
-      EventConnectionInfo.fields?.edges?.fieldsByTypeName?.EventEdge?.node
-        ?.fieldsByTypeName?.Event || {};
 
     const pgClient = await pgPool.connect();
 
     try {
-      const nodes = await getEvents(
-        pgClient,
-        args,
-        Object.keys(additionalFields).filter((key) => key !== "id")
-      );
+      const nodes = await getEvents(pgClient, args, fields);
 
       return connectionFromNodes(nodes, "Event");
     } finally {

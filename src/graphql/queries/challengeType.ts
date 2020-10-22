@@ -6,54 +6,59 @@ import {
   connectionFromNodes,
   resolveNodeFieldsFromConnection,
 } from "../utils";
-import { pgPool, getEventTypes } from "../../db";
+import { pgPool, getChallengeTypes } from "../../db";
 import {
-  EventTypeType,
-  EventTypeConnection,
+  ChallengeTypeNodeName,
+  ChallengeTypeType,
+  ChallengeTypeConnection,
   NodeByIDArguments,
 } from "../types";
 import { Context } from "../context";
 
-export const eventTypes: GraphQLFieldConfig<
+export const challengeTypes: GraphQLFieldConfig<
   {},
   Context,
   ConnectionArguments
 > = {
-  type: EventTypeConnection,
+  type: ChallengeTypeConnection,
   args: connectionArgs,
-  description: "The list of event types.",
+  description: "The list of challenge types.",
 
   async resolve(self, args, ctx, info) {
     const fields = resolveNodeFieldsFromConnection(
       info,
-      EventTypeConnection,
-      "EventType"
+      ChallengeTypeConnection,
+      ChallengeTypeNodeName
     );
 
     const pgClient = await pgPool.connect();
 
     try {
-      const nodes = await getEventTypes(pgClient, args, fields);
+      const nodes = await getChallengeTypes(pgClient, args, fields);
 
-      return connectionFromNodes(nodes, "EventType");
+      return connectionFromNodes(nodes, ChallengeTypeNodeName);
     } finally {
       pgClient.release();
     }
   },
 };
 
-export const eventType: GraphQLFieldConfig<{}, Context, ConnectionArguments> = {
-  type: EventTypeType,
+export const challengeType: GraphQLFieldConfig<
+  {},
+  Context,
+  ConnectionArguments
+> = {
+  type: ChallengeTypeType,
   args: {
     id: { type: new GraphQLNonNull(GraphQLID) },
   },
-  description: "Event type by ID",
+  description: "Challenge type by ID",
   resolve: (self, args, ctx, info) => {
     const { id: globalId } = args as NodeByIDArguments;
-    const eventTypeId = fromGlobalId(globalId, "EventType");
+    const challengeTypeId = fromGlobalId(globalId, ChallengeTypeNodeName);
     const { loaders } = ctx;
-    const { eventTypeLoader } = loaders;
+    const { challengeTypeLoader } = loaders;
 
-    return eventTypeLoader.load(Number(eventTypeId));
+    return challengeTypeLoader.load(Number(challengeTypeId));
   },
 };

@@ -1,5 +1,4 @@
-import DataLoader, { BatchLoadFn } from "dataloader";
-import { batchEventTypeById, Event, EventType, pgPool } from "../db";
+import { batchEventTypeById, EventType, pgPool } from "../db";
 
 export const eventType = async (
   keys: readonly number[]

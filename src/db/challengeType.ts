@@ -3,38 +3,39 @@ import { ConnectionArguments } from "graphql-relay";
 import { queryFromTableWithConnectionArgs, batchQueryTable } from "./utils";
 import { Node } from "../graphql/types";
 
-export interface EventType {
+export interface ChallengeType {
   id: number;
   tag: string;
   title: string;
 }
 
-export interface EventTypeNode extends Node {
+export interface ChallengeTypeNode extends Node {
   tag: string;
   title: string;
 }
 
-export const batchEventTypeById = async (
+export const batchChallengeTypeById = async (
   pgClient: PoolClient,
   ids: readonly number[],
   fields: string[]
-): Promise<EventType[]> => {
+): Promise<ChallengeType[]> => {
   return batchQueryTable(
     pgClient,
     ids.concat(),
     fields,
-    "challenger.event_type"
+    "challenger.challenge_type"
   );
 };
 
-export const getEventTypes = async (
+export const getChallengeTypes = async (
   pgClient: PoolClient,
   args: ConnectionArguments,
   fields: string[]
-): Promise<EventTypeNode[]> =>
-  queryFromTableWithConnectionArgs(
+): Promise<ChallengeTypeNode[]> => {
+  return queryFromTableWithConnectionArgs(
     pgClient,
     args,
-    "challenger.event_type",
+    "challenger.challenge_type",
     fields
   );
+};

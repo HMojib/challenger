@@ -1,6 +1,6 @@
 import { GraphQLNonNull, GraphQLID, GraphQLResolveInfo } from "graphql";
 import { mutationWithClientMutationId } from "graphql-relay";
-import { fromGlobalId, parseInterval } from "../../utils";
+import { fromGlobalId, parseInterval } from "../utils";
 import { Context } from "../context";
 import {
   EventType,
@@ -32,11 +32,17 @@ export interface UpdatEventInput {
   patch: EventPatch;
 }
 
-const validateEventMutation = (event: Event, userId: string): boolean => {
+const validateEventMutation = (
+  event: Event,
+  userId: string,
+  patch: EventPatch | undefined = undefined
+): boolean => {
   if (!event) {
     throw new Error("Event not found");
   } else if (event.createdBy !== userId) {
     throw new Error("You don't have permission to modify this Event");
+  } else if (patch && Object.keys(patch).length === 0) {
+    throw new Error("Patch requires at least one argument");
   } else {
     return true;
   }
@@ -129,7 +135,7 @@ export const updateEvent = mutationWithClientMutationId({
         "created_by",
       ]);
 
-      validateEventMutation(currentEvent, userId);
+      validateEventMutation(currentEvent, userId, patch);
 
       return updateEventById(pgClient, eventId, event);
     } finally {
