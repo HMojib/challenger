@@ -21,8 +21,8 @@ RUN npm install
 
 COPY . ./
 
-RUN chmod +x ./wait-for-it.sh ./docker-entrypoint.sh
+RUN chmod +x ./scripts/wait-for-it.sh ./scripts/docker-entrypoint.sh
 
 EXPOSE 5432
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+ENTRYPOINT ["./scripts/docker-entrypoint.sh"]

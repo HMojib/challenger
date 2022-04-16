@@ -2,8 +2,8 @@ exports.seed = async (knex) => {
   const eventTypes = [
     {
       id: 1,
-      tag: "music",
-      title: "Music",
+      tag: "audio",
+      title: "audio",
     },
   ];
 
